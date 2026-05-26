@@ -3,7 +3,8 @@ import React from "react";
 import { cn } from "../utils";
 
 const iconButtonMap = {
-  x: X
+  add: Plus,
+  x: X,
 };
 
 const variantStyleMap = {
