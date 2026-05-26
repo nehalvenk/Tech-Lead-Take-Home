@@ -16,7 +16,7 @@ const StatusBadge = ({ status, className }) => {
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-badge uppercase tracking-wide",
+        "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-badge uppercase tracking-wide w-36",
         variantStyleMap[status],
         className,
       )}
