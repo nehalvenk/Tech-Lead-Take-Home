@@ -7,6 +7,7 @@ A web application for authors to create and manage research publication submissi
 - **MongoDB** — database
 - **Express** — REST API
 - **React** (Vite) — frontend
+- **Tailwind CSS v4** — styling
 - **Node.js** — runtime
 
 ## Prerequisites
@@ -55,11 +56,15 @@ This starts both servers concurrently:
 
 ```
 /
-├── client/          # React + Vite frontend
+├── client/                  # React + Vite frontend
 │   └── src/
-│       ├── App.jsx
-│       └── ...
-└── server/          # Express + Mongoose backend
+│       ├── index.css        # Design tokens + Tailwind theme
+│       ├── utils.js         # cn() class utility
+│       ├── components/
+│       │   ├── Button.jsx
+│       │   └── StatusBadge.jsx
+│       └── App.jsx
+└── server/                  # Express + Mongoose backend
     └── src/
         ├── index.js
         ├── config/db.js
