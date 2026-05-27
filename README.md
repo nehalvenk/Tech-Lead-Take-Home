@@ -13,7 +13,7 @@ A web application for authors to create and manage research publication submissi
 ## Prerequisites
 
 - Node.js v18+
-- A running MongoDB instance (local or Atlas)
+- MongoDB installed and running locally ([install guide](https://www.mongodb.com/docs/manual/installation/))
 
 ## Getting Started
 
@@ -31,15 +31,27 @@ npm run install:all
 cp server/.env.example server/.env
 ```
 
-Open `server/.env` and set your values:
+The default values in `server/.env` work out of the box if MongoDB is running locally:
 
 ```
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/submissions
+PORT=3001
+MONGO_URI=mongodb://localhost:27017/manuscripts-db
 CLIENT_URL=http://localhost:5173
 ```
 
-### 3. Run the app
+### 3. Start MongoDB
+
+If MongoDB is not already running, start it:
+
+```bash
+# macOS (Homebrew)
+brew services start mongodb-community
+
+# or run directly
+mongod
+```
+
+### 4. Run the app
 
 ```bash
 npm run dev
@@ -47,10 +59,10 @@ npm run dev
 
 This starts both servers concurrently:
 
-| Service  | URL                   |
-|----------|-----------------------|
-| Client   | http://localhost:5173 |
-| API      | http://localhost:5000 |
+| Service | URL                    |
+|---------|------------------------|
+| Client  | http://localhost:5173  |
+| API     | http://localhost:3001  |
 
 ## Project Structure
 
