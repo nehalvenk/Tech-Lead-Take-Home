@@ -1,11 +1,16 @@
 import mongoose from 'mongoose';
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const AuthorSchema = new mongoose.Schema(
   {
-    firstName: { type: String, required: true, trim: true },
-    lastName:  { type: String, required: true, trim: true },
-    email:     { type: String, default: '', trim: true },
-    affiliation: { type: String, default: '', trim: true },
+    firstName:   { type: String, required: true, trim: true, maxlength: 100 },
+    lastName:    { type: String, required: true, trim: true, maxlength: 100 },
+    email:       {
+      type: String, default: '', trim: true, maxlength: 254,
+      validate: { validator: (v) => !v || EMAIL_RE.test(v), message: 'Invalid email format' },
+    },
+    affiliation: { type: String, default: '', trim: true, maxlength: 200 },
   },
   { _id: false },
 );
@@ -20,7 +25,10 @@ const SubmissionSchema = new mongoose.Schema(
       default: 'Software',
     },
     authors: { type: [AuthorSchema], default: [] },
-    doi:      { type: String, default: '', trim: true },
+    doi: {
+      type: String, default: '', trim: true,
+      validate: { validator: (v) => !v || /^10\.\d{4,}\/\S+$/.test(v), message: 'DOI must be in the format 10.XXXX/suffix' },
+    },
     abstract: { type: String, default: '', trim: true, maxlength: 3000 },
     status: {
       type: String,

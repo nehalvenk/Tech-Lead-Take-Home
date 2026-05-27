@@ -2,6 +2,7 @@ import { Router } from 'express';
 import Submission from '../models/Submission.js';
 
 const router = Router();
+const SETTABLE_STATUSES = ['unsubmitted', 'submitted'];
 
 // GET /api/submissions?search=&status=&startDate=&endDate=
 router.get('/', async (req, res) => {
@@ -37,7 +38,9 @@ router.get('/', async (req, res) => {
 // POST /api/submissions
 router.post('/', async (req, res) => {
   try {
-    const submission = new Submission(req.body);
+    const { status, ...rest } = req.body;
+    const safeStatus = SETTABLE_STATUSES.includes(status) ? status : 'unsubmitted';
+    const submission = new Submission({ ...rest, status: safeStatus });
     await submission.save();
     res.status(201).json(submission);
   } catch (err) {
@@ -48,9 +51,17 @@ router.post('/', async (req, res) => {
 // PUT /api/submissions/:id
 router.put('/:id', async (req, res) => {
   try {
+    const { status, ...rest } = req.body;
+    const update = { ...rest };
+    if (status !== undefined) {
+      if (!SETTABLE_STATUSES.includes(status)) {
+        return res.status(400).json({ message: `Status must be one of: ${SETTABLE_STATUSES.join(', ')}` });
+      }
+      update.status = status;
+    }
     const submission = await Submission.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: update },
       { new: true, runValidators: true },
     );
     if (!submission) return res.status(404).json({ message: 'Submission not found' });

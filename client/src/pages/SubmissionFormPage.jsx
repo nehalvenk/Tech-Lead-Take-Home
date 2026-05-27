@@ -15,6 +15,7 @@ import { createSubmission, updateSubmission } from "../api";
 
 const RESEARCH_TYPES = ["Software", "Dataset", "Article", "Preprint", "Other"];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DOI_RE = /^10\.\d{4,}\/\S+$/;
 const TITLE_MAX = 300;
 const ABSTRACT_MAX = 3000;
 
@@ -48,7 +49,7 @@ const SubmissionFormPage = ({ submission, onDone }) => {
     abstract: submission?.abstract ?? "",
   });
 
-  const [touched, setTouched] = useState({ title: false, authors: false });
+  const [touched, setTouched] = useState({ title: false, authors: false, doi: false });
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -68,7 +69,19 @@ const SubmissionFormPage = ({ submission, onDone }) => {
     return "";
   }, [form.abstract]);
 
+  const doiError = useMemo(() => {
+    if (!touched.doi) return "";
+    if (form.doi.trim() && !DOI_RE.test(form.doi.trim())) return "DOI must be in the format 10.XXXX/suffix (e.g. 10.1000/xyz123)";
+    return "";
+  }, [form.doi, touched.doi]);
+
   const authorErrors = useMemo(() => {
+    const emailCounts = {};
+    form.authors.forEach((a) => {
+      const key = a.email.trim().toLowerCase();
+      if (key) emailCounts[key] = (emailCounts[key] || 0) + 1;
+    });
+
     return form.authors.map((a) => {
       const errs = {};
       const anyFilled = a.firstName || a.lastName || a.email || a.affiliation;
@@ -77,7 +90,10 @@ const SubmissionFormPage = ({ submission, onDone }) => {
         if (!a.firstName.trim()) errs.firstName = "Required";
         if (!a.lastName.trim()) errs.lastName = "Required";
       }
-      if (a.email && !isValidEmail(a.email)) errs.email = "Invalid email format";
+      if (a.email) {
+        if (!isValidEmail(a.email)) errs.email = "Invalid email format";
+        else if (emailCounts[a.email.trim().toLowerCase()] > 1) errs.email = "Duplicate email";
+      }
       return errs;
     });
   }, [form.authors, touched.authors]);
@@ -85,6 +101,9 @@ const SubmissionFormPage = ({ submission, onDone }) => {
   const isValid = useMemo(() => {
     if (!form.title.trim() || form.title.trim().length > TITLE_MAX) return false;
     if (form.abstract.length > ABSTRACT_MAX) return false;
+    if (form.doi.trim() && !DOI_RE.test(form.doi.trim())) return false;
+    const emails = form.authors.map((a) => a.email.trim().toLowerCase()).filter(Boolean);
+    if (new Set(emails).size !== emails.length) return false;
     for (const a of form.authors) {
       const anyFilled = a.firstName || a.lastName || a.email || a.affiliation;
       if (anyFilled) {
@@ -131,7 +150,7 @@ const SubmissionFormPage = ({ submission, onDone }) => {
   });
 
   const handleSave = async (targetStatus) => {
-    setTouched({ title: true, authors: true });
+    setTouched({ title: true, authors: true, doi: true });
     if (!isValid) return;
     setSubmitting(true);
     setServerError("");
@@ -227,7 +246,9 @@ const SubmissionFormPage = ({ submission, onDone }) => {
           <TextInput
             value={form.doi}
             onChange={(e) => setForm((f) => ({ ...f, doi: e.target.value }))}
+            onBlur={() => setTouched((t) => ({ ...t, doi: true }))}
             placeholder="e.g. 10.1000/xyz123"
+            error={doiError}
           />
         </div>
 
