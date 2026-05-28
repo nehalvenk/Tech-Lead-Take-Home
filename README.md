@@ -68,22 +68,46 @@ This starts both servers concurrently:
 
 ```
 /
-├── client/                  # React + Vite frontend
+├── client/                       # React + Vite frontend
 │   └── src/
-│       ├── index.css        # Design tokens + Tailwind theme
-│       ├── utils.js         # cn() class utility
-│       ├── components/
-│       │   ├── Button.jsx
-│       │   └── StatusBadge.jsx
-│       └── App.jsx
-└── server/                  # Express + Mongoose backend
+│       ├── main.jsx              # App entry point
+│       ├── App.jsx               # Root component + routing
+│       ├── api.js                # Axios API client
+│       ├── index.css             # Design tokens + Tailwind theme
+│       ├── utils.js              # cn() class utility
+│       ├── pages/
+│       │   ├── DashboardPage.jsx
+│       │   └── SubmissionFormPage.jsx
+│       └── components/
+│           ├── Button.jsx
+│           ├── StatusBadge.jsx
+│           ├── dashboard/
+│           │   ├── DashboardHeader.jsx
+│           │   ├── SearchBar.jsx
+│           │   ├── SubmissionsTable.jsx
+│           │   └── SubmissionsTableRow.jsx
+│           ├── form/
+│           │   ├── AuthorsSection.jsx
+│           │   ├── FieldLabel.jsx
+│           │   ├── FormHeader.jsx
+│           │   ├── SelectInput.jsx
+│           │   ├── TextAreaInput.jsx
+│           │   └── TextInput.jsx
+│           └── sidebar/
+│               ├── NavItem.jsx
+│               ├── Sidebar.jsx
+│               └── UserProfile.jsx
+└── server/                       # Express + Mongoose backend
     └── src/
         ├── index.js
-        ├── config/db.js
-        ├── routes/
+        ├── seed.js               # Database seed script
+        ├── config/
+        │   └── db.js
         ├── models/
-        ├── controllers/
-        └── middleware/
+        │   └── Submission.js
+        └── routes/
+            ├── index.js
+            └── submissions.js
 ```
 
 ## Features
